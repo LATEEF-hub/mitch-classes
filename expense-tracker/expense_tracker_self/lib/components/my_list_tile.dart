@@ -40,9 +40,12 @@ class MyListTile extends StatelessWidget {
           ),
         ],
       ),
-      child: ListTile(
-        title: Text(title),
-        trailing: Text(trailing),
+      child: SizedBox(
+        height: 45,
+        child: ListTile(
+          title: Text(title),
+          trailing: Text(trailing),
+        ),
       ),
     );
   }

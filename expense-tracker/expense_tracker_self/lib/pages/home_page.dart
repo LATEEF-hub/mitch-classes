@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
 
         //return UI
         return Scaffold(
-          backgroundColor: Color.fromARGB(255, 252, 252, 252),
+          backgroundColor: Colors.grey.shade300,
           floatingActionButton: FloatingActionButton(
             onPressed: openNewExpenseBox,
             child: const Icon(Icons.add),

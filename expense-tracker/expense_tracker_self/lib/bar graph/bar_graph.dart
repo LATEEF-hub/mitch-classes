@@ -45,7 +45,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
         child: BarChart(
           BarChartData(
             minY: 0,
-            maxY: 100,
+            maxY: 500,
             gridData: const FlGridData(show: false),
             borderData: FlBorderData(show: false),
             titlesData: const FlTitlesData(
@@ -58,7 +58,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
                 sideTitles: SideTitles(
                   showTitles: true,
                   getTitlesWidget: getBottomTitles,
-                  reservedSize: 25,
+                  reservedSize: 40,
                 ),
               ),
             ),
@@ -71,10 +71,11 @@ class _MyBarGraphState extends State<MyBarGraph> {
                         toY: data.y,
                         width: 15,
                         borderRadius: BorderRadius.circular(4),
-                        color: Colors.grey,
+                        color: Color.fromARGB(255, 62, 254, 4),
                         backDrawRodData: BackgroundBarChartRodData(
                           show: true,
-                          toY: 100,
+                          toY: 500,
+                          color: Colors.white,
                         ),
                       ),
                     ],
