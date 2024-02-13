@@ -60,11 +60,23 @@ class MyApp extends StatelessWidget {
     }
 
 
-    switch (expression) {
-      case value:
-        
+    switch (grade) {
+      case 'A':
+      print('Excellent');
         break;
+      case 'B':
+      print('Good');
+        break;
+      case 'c':
+      print('Fair');
+        break; 
+      case 'D':
+      print('Requires improvement');
+      case 'E':
+      print('Poor Grade');
       default:
+      print('You have failed woefully!!');
+
     }
 
     return const MaterialApp(
