@@ -1,6 +1,5 @@
 import 'package:isar/isar.dart';
 
-
 //This line is needed to generate isar file for Database
 //Run cmd: dart run build_runner build
 part 'expense.g.dart';
@@ -10,8 +9,7 @@ class Expense {
   Id id = Isar.autoIncrement; // 0,1,2,3...
   final String name;
   final double amount;
-  final  DateTime dateTime;
-  
+  final DateTime dateTime;
 
   Expense({
     required this.name,
@@ -19,4 +17,3 @@ class Expense {
     required this.dateTime,
   });
 }
-
