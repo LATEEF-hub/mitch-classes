@@ -2,7 +2,7 @@
 
 Helpful functions used across the app
 */
-
+// use this package for number format and currency
 import 'package:intl/intl.dart';
 
 //convert string to double

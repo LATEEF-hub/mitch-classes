@@ -3,6 +3,8 @@
 import 'package:expense_tracker_self/database/expense_database.dart';
 import 'package:expense_tracker_self/helper/helper_functions.dart';
 import 'package:expense_tracker_self/models/expense.dart';
+import 'package:expense_tracker_self/components/my_list_tile.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,6 +16,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  //(Anything UI related best create here***)
   // text controllers
   TextEditingController nameController = TextEditingController();
   TextEditingController amountController = TextEditingController();
@@ -26,7 +29,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
   }
 
-  // open new expense box (Anything UI related best create here***)
+  // open new expense box
   void openNewExpenseBox() {
     showDialog(
       context: context,
@@ -35,19 +38,16 @@ class _HomePageState extends State<HomePage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            //user input -> expense name
             TextField(
               controller: nameController,
               decoration: const InputDecoration(
-                  alignLabelWithHint: false, hintText: 'Enter name of expense'),
+                  alignLabelWithHint: false, hintText: 'Name'),
             ),
+            // user input -> expense amount
             TextField(
               controller: amountController,
-              decoration: const InputDecoration(hintText: 'Enter Amount'),
-            ),
-            TextField(
-              autocorrect: true,
-              controller: descriptionController,
-              decoration: const InputDecoration(hintText: 'Enter Notes'),
+              decoration: const InputDecoration(hintText: 'Amount'),
             ),
           ],
         ),
@@ -56,7 +56,60 @@ class _HomePageState extends State<HomePage> {
           _cancelButton(),
 
           //save button
-          _createNewExpenseButton()
+          _createNewExpenseButton(),
+        ],
+      ),
+    );
+  }
+
+  // open edit box
+  void openEditBox(Expense expense) {
+    //prefill values into textfields
+    String existingName = expense.name;
+    String existingAmount = expense.amount.toString();
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit expense'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            //user input -> expense name
+            TextField(
+              controller: nameController,
+              decoration: InputDecoration(hintText: existingName),
+            ),
+            // user input -> expense amount
+            TextField(
+              controller: amountController,
+              decoration: InputDecoration(hintText: existingAmount),
+            ),
+          ],
+        ),
+        actions: [
+          //cancel button
+          _cancelButton(),
+
+          //save button
+          _editExpenseButton(expense),
+        ],
+      ),
+    );
+  }
+
+  // open delete box
+  void openDeleteBox(Expense expense) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete expense'),
+        actions: [
+          //cancel button
+          _cancelButton(),
+
+          //save button
+          _deleteExpenseButton(expense.id),
         ],
       ),
     );
@@ -75,11 +128,12 @@ class _HomePageState extends State<HomePage> {
           itemBuilder: (context, index) {
             //get individual expense
             Expense individualExpense = value.allExpense[index];
-
             //return list tile UI
-            return ListTile(
-              title: Text(individualExpense.name),
-              trailing: Text(formatAmount(individualExpense.amount)),
+            return MyListTile(
+              title: individualExpense.name,
+              trailing: formatAmount(individualExpense.amount),
+              onEditPressed: (context) => openEditBox(individualExpense),
+              onDeletePressed: (context) => openDeleteBox(individualExpense),
             );
           },
         ),
@@ -125,6 +179,51 @@ class _HomePageState extends State<HomePage> {
         }
       },
       child: const Text("Create"),
+    );
+  }
+
+  //SAVE BUTTON -> Edit existing expense
+
+  Widget _editExpenseButton(Expense expense) {
+    return MaterialButton(
+      onPressed: () async {
+        //save as long as at least one textfield is modified
+        if (nameController.text.isNotEmpty ||
+            amountController.text.isNotEmpty) {
+          //pop box
+          Navigator.pop(context);
+
+          //create a new updated expense
+          Expense updatedExpense = Expense(
+            name: nameController.text.isNotEmpty
+                ? nameController.text
+                : expense.name,
+            amount: amountController.text.isNotEmpty
+                ? convertStringToDouble(amountController.text)
+                : expense.amount,
+            dateTime: DateTime.now(),
+          );
+          // old expense id(To keep the Id same while updating an item)
+          int existingId = expense.id;
+          //update the database with the new data
+          await context
+              .read<ExpenseDatabase>()
+              .updateExpense(existingId, updatedExpense);
+        }
+      },
+      child: const Text('Save'),
+    );
+  }
+
+  // DELETE BUTTON
+  Widget _deleteExpenseButton(int id) {
+    return MaterialButton(
+      onPressed: () async {
+        // pop box
+        Navigator.pop(context);
+        // delete expense from db
+        await context.read<ExpenseDatabase>().deleteExpense(id);
+      },
     );
   }
 }
