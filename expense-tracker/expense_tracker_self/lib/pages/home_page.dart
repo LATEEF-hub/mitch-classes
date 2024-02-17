@@ -224,6 +224,7 @@ class _HomePageState extends State<HomePage> {
         // delete expense from db
         await context.read<ExpenseDatabase>().deleteExpense(id);
       },
+      child: const Text('Delete'),
     );
   }
 }
