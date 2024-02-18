@@ -25,11 +25,18 @@ class MyListTile extends StatelessWidget {
           SlidableAction(
             onPressed: onEditPressed,
             icon: Icons.settings,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.grey,
+            borderRadius: BorderRadius.circular(10),
           ),
+
           //delete option
           SlidableAction(
             onPressed: onDeletePressed,
             icon: Icons.delete,
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.red,
+            borderRadius: BorderRadius.circular(10),
           ),
         ],
       ),
