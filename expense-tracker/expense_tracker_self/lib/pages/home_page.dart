@@ -1,6 +1,6 @@
 // import 'dart:js';
 
-import 'package:expense_tracker_self/bar%20graph/bar_graph.dart';
+import 'package:expense_tracker_self/bar_graph/bar_graph.dart';
 import 'package:expense_tracker_self/database/expense_database.dart';
 import 'package:expense_tracker_self/helper/helper_functions.dart';
 import 'package:expense_tracker_self/models/expense.dart';
@@ -17,17 +17,30 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //(Anything UI related best create here***)
+  //(Anything UI related best create here define here***)
   // text controllers
   TextEditingController nameController = TextEditingController();
   TextEditingController amountController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
 
-  // to read the expenses from DB
+  //futures to lead graph data
+  Future<Map<int, double>>? _monthlyTotalsFuture;
+
+  // to read the expenses from DB we need a provider
   @override
   void initState() {
+    //read db on initial startup
     Provider.of<ExpenseDatabase>(context, listen: false).readExpenses();
+
+    // load futures;
+    refreshGraphData();
+
     super.initState();
+  }
+
+  //refresh graph data
+  void refreshGraphData() {
+    _monthlyTotalsFuture = Provider.of<ExpenseDatabase>(context, listen: false)
+        .calculateMonthlyTotals();
   }
 
   // open new expense box
@@ -119,41 +132,80 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Consumer<ExpenseDatabase>(
-      builder: (context, value, child) =>
-          // Get dates
-          //Cal number of month since the first month
-          //only display the expenses for the current month
-          Scaffold(
-        backgroundColor: const Color.fromARGB(255, 191, 221, 192),
-        floatingActionButton: FloatingActionButton(
-          onPressed: openNewExpenseBox,
-          child: const Icon(Icons.add),
-        ),
-        body: Column(
-          children: [
-            //Graph Bar UI
-            MyBarGraph(monthlySummary: monthlySummary, startMonth: startMonth),
-            //Expense LIST UI
-            Expanded(
-              child: ListView.builder(
-                itemCount: value.allExpense.length,
-                itemBuilder: (context, index) {
-                  //get individual expense
-                  Expense individualExpense = value.allExpense[index];
-                  //return list tile UI
-                  return MyListTile(
-                    title: individualExpense.name,
-                    trailing: formatAmount(individualExpense.amount),
-                    onEditPressed: (context) => openEditBox(individualExpense),
-                    onDeletePressed: (context) =>
-                        openDeleteBox(individualExpense),
-                  );
-                },
-              ),
+      builder: (context, value, child) {
+        // Get dates
+        int startMonth = value.getStartMonth();
+        int startYear = value.getStartYear();
+        int currentMonth = DateTime.now().month;
+        int currentYear = DateTime.now().year;
+
+        //Cal number of month since the first month
+        int monthCount = calculateMonthCount(
+            startYear, startMonth, currentYear, currentMonth);
+        //only display the expenses for the current month
+
+        //return UI
+        return Scaffold(
+          backgroundColor: const Color.fromARGB(255, 202, 217, 203),
+          floatingActionButton: FloatingActionButton(
+            onPressed: openNewExpenseBox,
+            child: const Icon(Icons.add),
+          ),
+          body: SafeArea(
+            child: Column(
+              children: [
+                //Graph Bar UI
+                SizedBox(
+                  height: 250,
+                  child: FutureBuilder(
+                    future: _monthlyTotalsFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        final monthlyTotals = snapshot.data ?? {};
+
+                        //create the list of monthly summary
+                        List<double> monthlySummary = List.generate(
+                            monthCount,
+                            (index) =>
+                                monthlyTotals[startMonth + index] ?? 0.0);
+
+                        return MyBarGraph(
+                            monthlySummary: monthlySummary,
+                            startMonth: startMonth);
+                      }
+                      //loading...
+                      else {
+                        return const Center(
+                          child: Text('Loading...'),
+                        );
+                      }
+                    },
+                  ),
+                ),
+                //Expense LIST UI
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: value.allExpense.length,
+                    itemBuilder: (context, index) {
+                      //get individual expense
+                      Expense individualExpense = value.allExpense[index];
+                      //return list tile UI
+                      return MyListTile(
+                        title: individualExpense.name,
+                        trailing: formatAmount(individualExpense.amount),
+                        onEditPressed: (context) =>
+                            openEditBox(individualExpense),
+                        onDeletePressed: (context) =>
+                            openDeleteBox(individualExpense),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -175,7 +227,7 @@ class _HomePageState extends State<HomePage> {
   Widget _createNewExpenseButton() {
     return MaterialButton(
       onPressed: () async {
-        //save on;y if all textfield are filled
+        //save only if all textfield are filled
         if (nameController.text.isNotEmpty &&
             amountController.text.isNotEmpty) {
           //pop box
