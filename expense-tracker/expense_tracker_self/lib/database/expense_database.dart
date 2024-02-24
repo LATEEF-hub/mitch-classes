@@ -78,24 +78,25 @@ class ExpenseDatabase extends ChangeNotifier {
   */
 
   //calculate total expense for each month
-  Future<Map<int, double>> calculateMonthlyTotals() async {
+
+  Future<Map<String, double>> calculateMonthlyTotals() async {
     //ensure  data is loaded from database
     await readExpenses();
     //create a map with months as keys and initial value of 0.0
-    Map<int, double> monthlyTotals = {};
+    Map<String, double> monthlyTotals = {};
     //January: 0.0, February: 0.0, March:
     for (var expense in _allExpenses) {
-      // extract month of expense date
-      int month = expense.dateTime.month;
+      // extract year & month of expense date
+      String yearMonth = "${expense.dateTime.year}_${expense.dateTime.month}";
       //add to list if not already there
       //Here. we also use If statement
-      if (!monthlyTotals.containsKey(month)) {
-        monthlyTotals[month] = 0.0;
+      if (!monthlyTotals.containsKey(yearMonth)) {
+        monthlyTotals[yearMonth] = 0.0;
       }
       // monthlyTotals[month] ??= 0.0;
 
       //add expense amount to the total for the month
-      monthlyTotals[month] = monthlyTotals[month]! + expense.amount;
+      monthlyTotals[yearMonth] = monthlyTotals[yearMonth]! + expense.amount;
     }
     return monthlyTotals;
   }
