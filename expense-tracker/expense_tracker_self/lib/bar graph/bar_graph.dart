@@ -31,6 +31,18 @@ class _MyBarGraphState extends State<MyBarGraph> {
     );
   }
 
+  //calculate max for upper limit of graph
+  double calculateMax() {
+    double max = 500;
+    //get the month with the highest amount
+    widget.monthlySummary.sort();
+    max = widget.monthlySummary.last * 1.05;
+    if (max < 500) {
+      return 500;
+    }
+    return max;
+  }
+
   @override
   Widget build(BuildContext context) {
     initializeBarData();
@@ -40,48 +52,56 @@ class _MyBarGraphState extends State<MyBarGraph> {
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      child: SizedBox(
-        width: barWidth * barData.length + spaceBtwBars * (barData.length - 1),
-        child: BarChart(
-          BarChartData(
-            minY: 0,
-            maxY: 500,
-            gridData: const FlGridData(show: false),
-            borderData: FlBorderData(show: false),
-            titlesData: const FlTitlesData(
-              show: true,
-              topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              rightTitles:
-                  AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  getTitlesWidget: getBottomTitles,
-                  reservedSize: 40,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 25.0),
+        child: SizedBox(
+          width:
+              barWidth * barData.length + spaceBtwBars * (barData.length - 1),
+          child: BarChart(
+            BarChartData(
+              minY: 0,
+              maxY: calculateMax(),
+              gridData: const FlGridData(show: false),
+              borderData: FlBorderData(show: false),
+              titlesData: const FlTitlesData(
+                show: true,
+                topTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                leftTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                rightTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: getBottomTitles,
+                    reservedSize: 40,
+                  ),
                 ),
               ),
-            ),
-            barGroups: barData
-                .map(
-                  (data) => BarChartGroupData(
-                    x: data.x,
-                    barRods: [
-                      BarChartRodData(
-                        toY: data.y,
-                        width: 15,
-                        borderRadius: BorderRadius.circular(4),
-                        color: Color.fromARGB(255, 62, 254, 4),
-                        backDrawRodData: BackgroundBarChartRodData(
-                          show: true,
-                          toY: 500,
-                          color: Colors.white,
+              barGroups: barData
+                  .map(
+                    (data) => BarChartGroupData(
+                      x: data.x,
+                      barRods: [
+                        BarChartRodData(
+                          toY: data.y,
+                          width: barWidth,
+                          borderRadius: BorderRadius.circular(4),
+                          color: const Color(0xafa080808),
+                          backDrawRodData: BackgroundBarChartRodData(
+                            show: true,
+                            toY: calculateMax(),
+                            color: const Color(0x9afdadada),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                )
-                .toList(),
+                      ],
+                    ),
+                  )
+                  .toList(),
+              alignment: BarChartAlignment.center,
+              groupsSpace: spaceBtwBars,
+            ),
           ),
         ),
       ),

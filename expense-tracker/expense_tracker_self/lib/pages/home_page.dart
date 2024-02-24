@@ -22,8 +22,9 @@ class _HomePageState extends State<HomePage> {
   TextEditingController nameController = TextEditingController();
   TextEditingController amountController = TextEditingController();
 
-  //futures to lead graph data
+  //futures to lead graph data & monthly totals
   Future<Map<int, double>>? _monthlyTotalsFuture;
+  Future<double>? _calculateCurrentMonthTotal;
 
   // to read the expenses from DB we need a provider
   @override
@@ -32,15 +33,18 @@ class _HomePageState extends State<HomePage> {
     Provider.of<ExpenseDatabase>(context, listen: false).readExpenses();
 
     // load futures;
-    refreshGraphData();
+    refreshData();
 
     super.initState();
   }
 
-  //refresh graph data
-  void refreshGraphData() {
+  //refresh data
+  void refreshData() {
     _monthlyTotalsFuture = Provider.of<ExpenseDatabase>(context, listen: false)
         .calculateMonthlyTotals();
+    _calculateCurrentMonthTotal =
+        Provider.of<ExpenseDatabase>(context, listen: false)
+            .calculateCurrentMonthTotal();
   }
 
   // open new expense box
@@ -143,13 +147,40 @@ class _HomePageState extends State<HomePage> {
         int monthCount = calculateMonthCount(
             startYear, startMonth, currentYear, currentMonth);
         //only display the expenses for the current month
+        List<Expense> currentMonthEx = value.allExpense.where((expense) {
+          return expense.dateTime.year == currentYear &&
+              expense.dateTime.month == currentMonth;
+        }).toList();
 
         //return UI
         return Scaffold(
-          backgroundColor: Colors.grey.shade300,
+          backgroundColor: const Color(0x9AFF6E199),
           floatingActionButton: FloatingActionButton(
             onPressed: openNewExpenseBox,
             child: const Icon(Icons.add),
+          ),
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            title: FutureBuilder(
+              future: _calculateCurrentMonthTotal,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      //amount title
+                      Text('\$${snapshot.data!.toStringAsFixed(2)}'),
+                      // amount name
+                      Text(getCurrentMonthName())
+                    ],
+                  );
+                }
+                //loading
+                else {
+                  return Text("Loading...");
+                }
+              },
+            ),
           ),
           body: SafeArea(
             child: Column(
@@ -186,10 +217,13 @@ class _HomePageState extends State<HomePage> {
                 //Expense LIST UI
                 Expanded(
                   child: ListView.builder(
-                    itemCount: value.allExpense.length,
+                    itemCount: currentMonthEx.length,
                     itemBuilder: (context, index) {
+                      //reverse the list to start from latest* then pass it IE
+                      int reversedIndex = currentMonthEx.length - 1 - index;
+
                       //get individual expense
-                      Expense individualExpense = value.allExpense[index];
+                      Expense individualExpense = currentMonthEx[reversedIndex];
                       //return list tile UI
                       return MyListTile(
                         title: individualExpense.name,
@@ -242,7 +276,7 @@ class _HomePageState extends State<HomePage> {
           //save to db
           await context.read<ExpenseDatabase>().createNewExpense(newExpense);
           // refresh the graph
-          refreshGraphData();
+          refreshData();
 
           //clear controllers
           amountController.clear();
@@ -281,7 +315,7 @@ class _HomePageState extends State<HomePage> {
               .read<ExpenseDatabase>()
               .updateExpense(existingId, updatedExpense);
           // refresh the graph
-          refreshGraphData();
+          refreshData();
         }
       },
       child: const Text('Save'),
@@ -297,7 +331,7 @@ class _HomePageState extends State<HomePage> {
         // delete expense from db
         await context.read<ExpenseDatabase>().deleteExpense(id);
         //refresh the graph
-        refreshGraphData();
+        refreshData();
       },
       child: const Text('Delete'),
     );

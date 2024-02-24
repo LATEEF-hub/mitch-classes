@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:expense_tracker_self/models/expense.dart';
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
@@ -96,6 +98,26 @@ class ExpenseDatabase extends ChangeNotifier {
       monthlyTotals[month] = monthlyTotals[month]! + expense.amount;
     }
     return monthlyTotals;
+  }
+
+  //Calculate current month total
+  Future<double> calculateCurrentMonthTotal() async {
+    //ensure expense are read from rd first
+    await readExpenses();
+    //get current and year
+    int currentMonth = DateTime.now().month;
+    int currentYear = DateTime.now().year;
+    // firlst the ex to include only this for this mon this yea
+    List<Expense> currentMonthExpenses = _allExpenses.where((expense) {
+      return expense.dateTime.month == currentMonth &&
+          expense.dateTime.year == currentYear;
+    }).toList();
+
+    //cal total amount for the current month
+    double totalForThisMonth =
+        currentMonthExpenses.fold(0, (sum, expense) => sum + expense.amount);
+
+    return totalForThisMonth;
   }
 
   // Get start month'
