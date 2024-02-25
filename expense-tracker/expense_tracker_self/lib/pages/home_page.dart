@@ -23,7 +23,7 @@ class _HomePageState extends State<HomePage> {
   TextEditingController amountController = TextEditingController();
 
   //futures to lead graph data & monthly totals
-  Future<Map<int, double>>? _monthlyTotalsFuture;
+  Future<Map<String, double>>? _monthlyTotalsFuture;
   Future<double>? _calculateCurrentMonthTotal;
 
   // to read the expenses from DB we need a provider
@@ -156,6 +156,8 @@ class _HomePageState extends State<HomePage> {
         return Scaffold(
           backgroundColor: const Color(0x9AFF6E199),
           floatingActionButton: FloatingActionButton(
+            foregroundColor: Colors.amber,
+            backgroundColor: Colors.black,
             onPressed: openNewExpenseBox,
             child: const Icon(Icons.add),
           ),
@@ -164,20 +166,24 @@ class _HomePageState extends State<HomePage> {
             title: FutureBuilder(
               future: _calculateCurrentMonthTotal,
               builder: (context, snapshot) {
+                //data is loaded ?
                 if (snapshot.connectionState == ConnectionState.done) {
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      const Icon(Icons.menu),
                       //amount title
                       Text('\$${snapshot.data!.toStringAsFixed(2)}'),
                       // amount name
-                      Text(getCurrentMonthName())
+                      Text(
+                        getCurrentMonthName(),
+                      ),
                     ],
                   );
                 }
                 //loading
                 else {
-                  return Text("Loading...");
+                  return const Text("Loading...");
                 }
               },
             ),
@@ -193,13 +199,24 @@ class _HomePageState extends State<HomePage> {
                     builder: (context, snapshot) {
                       // Is data loaded ?
                       if (snapshot.connectionState == ConnectionState.done) {
-                        final monthlyTotals = snapshot.data ?? {};
+                        Map<String, double> monthlyTotals = snapshot.data ?? {};
 
                         //create the list of monthly summary
                         List<double> monthlySummary = List.generate(
-                            monthCount,
-                            (index) =>
-                                monthlyTotals[startMonth + index] ?? 0.0);
+                          monthCount,
+                          (index) {
+                            //call startYear and month considering index
+                            int year =
+                                startYear + (startMonth + index - 1) ~/ 12;
+                            int month = (startMonth + index - 1) % 12 + 1;
+
+                            // create the key in the format 'year-month'
+                            String yearMonthKey = '$year-$month';
+
+                            // return the total for year-month or 0.0  if !exist
+                            return monthlyTotals[yearMonthKey] ?? 0.0;
+                          },
+                        );
 
                         return MyBarGraph(
                             monthlySummary: monthlySummary,
@@ -213,6 +230,9 @@ class _HomePageState extends State<HomePage> {
                       }
                     },
                   ),
+                ),
+                const SizedBox(
+                  height: 25,
                 ),
                 //Expense LIST UI
                 Expanded(

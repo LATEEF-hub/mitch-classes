@@ -17,34 +17,39 @@ class MyListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Slidable(
-      endActionPane: ActionPane(
-        motion: const StretchMotion(),
-        children: [
-          //setting option
-          SlidableAction(
-            onPressed: onEditPressed,
-            icon: Icons.settings,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.grey,
-            borderRadius: BorderRadius.circular(10),
-          ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 5),
+      child: Slidable(
+        endActionPane: ActionPane(
+          motion: const StretchMotion(),
+          children: [
+            //setting option
+            SlidableAction(
+              onPressed: onEditPressed,
+              icon: Icons.settings,
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.grey,
+              borderRadius: BorderRadius.circular(10),
+            ),
 
-          //delete option
-          SlidableAction(
-            onPressed: onDeletePressed,
-            icon: Icons.delete,
-            foregroundColor: Colors.white,
-            backgroundColor: Colors.red,
-            borderRadius: BorderRadius.circular(10),
+            //delete option
+            SlidableAction(
+              onPressed: onDeletePressed,
+              icon: Icons.delete,
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.red,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ],
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+              color: Colors.grey.shade400,
+              borderRadius: BorderRadius.circular(8)),
+          child: ListTile(
+            title: Text(title),
+            trailing: Text(trailing),
           ),
-        ],
-      ),
-      child: SizedBox(
-        height: 45,
-        child: ListTile(
-          title: Text(title),
-          trailing: Text(trailing),
         ),
       ),
     );

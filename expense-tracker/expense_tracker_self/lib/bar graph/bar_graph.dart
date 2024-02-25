@@ -51,7 +51,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
     double max = 500;
     //get the month with the highest amount
     widget.monthlySummary.sort();
-    max = widget.monthlySummary.last * 1.05;
+    max = widget.monthlySummary.last * 1.40;
     if (max < 500) {
       return 500;
     }
@@ -91,7 +91,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
                   sideTitles: SideTitles(
                     showTitles: true,
                     getTitlesWidget: getBottomTitles,
-                    reservedSize: 40,
+                    reservedSize: 25,
                   ),
                 ),
               ),
