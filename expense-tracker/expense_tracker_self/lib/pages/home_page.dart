@@ -219,8 +219,9 @@ class _HomePageState extends State<HomePage> {
                         );
 
                         return MyBarGraph(
-                            monthlySummary: monthlySummary,
-                            startMonth: startMonth);
+                          monthlySummary: monthlySummary,
+                          startMonth: startMonth,
+                        );
                       }
                       //loading...
                       else {
@@ -237,6 +238,7 @@ class _HomePageState extends State<HomePage> {
                 //Expense LIST UI
                 Expanded(
                   child: ListView.builder(
+                    // physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: currentMonthEx.length,
                     itemBuilder: (context, index) {
                       //reverse the list to start from latest* then pass it IE
