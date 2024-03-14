@@ -42,7 +42,7 @@ class LoginPage extends StatelessWidget {
                 obscureText: false,
               ),
               const SizedBox(
-                height: 25,
+                height: 10,
               ),
               // password Textfield
               MyTextField(
@@ -51,6 +51,26 @@ class LoginPage extends StatelessWidget {
                 obscureText: true,
                 labelText: 'Password',
               ),
+              const SizedBox(
+                height: 10,
+              ),
+              //Forgot password
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Forgot password?',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+              //Sign in
             ],
           ),
         ),

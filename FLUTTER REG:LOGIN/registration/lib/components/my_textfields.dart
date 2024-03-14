@@ -34,6 +34,9 @@ class MyTextField extends StatelessWidget {
           fillColor: const Color.fromARGB(255, 187, 234, 189),
           filled: true,
           hintText: hintText,
+          hintStyle: TextStyle(
+            color: Colors.grey[500],
+          ),
         ),
       ),
     );
