@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:modernlogintute/components/my_button.dart';
 import 'package:modernlogintute/components/my_textfields.dart';
+import 'package:modernlogintute/components/square_tile.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -8,6 +11,9 @@ class LoginPage extends StatelessWidget {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
 
+  //Sign in method
+  void signUserIn() {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -15,6 +21,7 @@ class LoginPage extends StatelessWidget {
       body: SafeArea(
         child: Center(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 50),
               //App Logo
@@ -71,6 +78,77 @@ class LoginPage extends StatelessWidget {
                 height: 25,
               ),
               //Sign in
+              SignInButton(
+                onTap: signUserIn,
+              ),
+              const SizedBox(
+                height: 25,
+              ),
+
+              // Or continue with
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Divider(
+                        thickness: 0.8,
+                        color: Colors.green[400],
+                      ),
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 30.0),
+                      child: Text(
+                        'Or Continue with',
+                      ),
+                    ),
+                    Expanded(
+                      child: Divider(
+                        thickness: 0.8,
+                        color: Colors.green[400],
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              //google + apple SignIn
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  //google button
+                  SquareTile(
+                    imagePath: 'lib/images/google.png',
+                  ),
+                  SizedBox(
+                    width: 15,
+                  ),
+
+                  // apple button
+                  SquareTile(
+                    imagePath: 'lib/images/apple.png',
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 50,
+              ),
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Not a member?'),
+                  SizedBox(
+                    width: 6,
+                  ),
+                  Text(
+                    'Register now',
+                    style: TextStyle(
+                        color: Colors.black87, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              )
             ],
           ),
         ),
