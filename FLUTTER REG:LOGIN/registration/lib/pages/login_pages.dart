@@ -1,18 +1,86 @@
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+
 import 'package:modernlogintute/components/my_button.dart';
 import 'package:modernlogintute/components/my_textfields.dart';
 import 'package:modernlogintute/components/square_tile.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
 
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   //creating controls for the TEXTEDIT FIELD
-  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   //Sign in method
-  void signUserIn() {}
+  void signUserIn() async {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+
+    //try sign in
+    try {
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text,
+        password: passwordController.text,
+      );
+      //pop the loading circle after LOGIN
+      Navigator.pop(context);
+    } on FirebaseAuthException catch (e) {
+      //pop the loading CIRCLE
+      Navigator.pop(context);
+      //Wrong email
+      if (e.code == 'user-not-found') {
+        //show error
+        wrongEmailMessage();
+      }
+
+      //Wrong Password
+      else if (e.code == 'wrong-password') {
+        //error msg
+        wrongPasswordMessage();
+      }
+    }
+  }
+
+  //wrong email message
+  void wrongEmailMessage() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const AlertDialog(
+          title: Text(
+            'Incorrect Email',
+          ),
+        );
+      },
+    );
+  }
+
+  //Wrong password message
+  void wrongPasswordMessage() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return const AlertDialog(
+          title: Text(
+            'Incorrect Password',
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +111,7 @@ class LoginPage extends StatelessWidget {
               ),
               //Username Textfield
               MyTextField(
-                controller: usernameController,
+                controller: emailController,
                 hintText: 'Username',
                 labelText: 'Username',
                 obscureText: false,
@@ -138,7 +206,7 @@ class LoginPage extends StatelessWidget {
               const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('Not a member?'),
+                  Text('Not a member?'),
                   SizedBox(
                     width: 6,
                   ),
