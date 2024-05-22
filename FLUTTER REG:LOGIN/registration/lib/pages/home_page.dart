@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -24,10 +25,20 @@ class HomePage extends StatelessWidget {
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
-      body: Center(
-        child: Text(
-          'Logged in!!! ${user.email!}',
-        ),
+      body: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(18.0),
+          ),
+          const Text(
+            'You are one of the selected member of platinum Arial App',
+          ),
+          Center(
+            child: Text(
+              'Logged in!!! ${user.email!}',
+            ),
+          ),
+        ],
       ),
     );
   }
