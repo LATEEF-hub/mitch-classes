@@ -20,6 +20,14 @@ class _MyBarGraphState extends State<MyBarGraph> {
   //thus list will hold the data for each bar
   List<IndividualBar> barData = [];
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) => scrollToEnd());
+  }
+
   //initialize bar data-user our monthly summary to create a list of Bars
   void initializeBarData() {
     barData = List.generate(
@@ -29,6 +37,13 @@ class _MyBarGraphState extends State<MyBarGraph> {
         y: widget.monthlySummary[index],
       ),
     );
+  }
+
+  //S C to make sure current month // lastest is display
+  final ScrollController _scrollController = ScrollController();
+  void scrollToEnd() {
+    _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+        duration: const Duration(seconds: 1), curve: Curves.fastOutSlowIn);
   }
 
   //calculate max for upper limit of graph
@@ -52,6 +67,7 @@ class _MyBarGraphState extends State<MyBarGraph> {
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
+      controller: _scrollController,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 25.0),
         child: SizedBox(
