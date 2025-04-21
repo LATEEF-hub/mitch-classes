@@ -1,6 +1,6 @@
 // import 'dart:js';
 
-import 'package:expense_tracker_self/bar_graph/bar_graph.dart';
+import 'package:expense_tracker_self/bar%20graph/bar_graph.dart';
 import 'package:expense_tracker_self/database/expense_database.dart';
 import 'package:expense_tracker_self/helper/helper_functions.dart';
 import 'package:expense_tracker_self/models/expense.dart';
@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
 
         //return UI
         return Scaffold(
-          backgroundColor: const Color.fromARGB(255, 202, 217, 203),
+          backgroundColor: Color.fromARGB(255, 252, 252, 252),
           floatingActionButton: FloatingActionButton(
             onPressed: openNewExpenseBox,
             child: const Icon(Icons.add),
@@ -154,12 +154,13 @@ class _HomePageState extends State<HomePage> {
           body: SafeArea(
             child: Column(
               children: [
-                //Graph Bar UI
+                //Graph UI
                 SizedBox(
                   height: 250,
                   child: FutureBuilder(
                     future: _monthlyTotalsFuture,
                     builder: (context, snapshot) {
+                      // Is data loaded ?
                       if (snapshot.connectionState == ConnectionState.done) {
                         final monthlyTotals = snapshot.data ?? {};
 
@@ -240,6 +241,8 @@ class _HomePageState extends State<HomePage> {
           );
           //save to db
           await context.read<ExpenseDatabase>().createNewExpense(newExpense);
+          // refresh the graph
+          refreshGraphData();
 
           //clear controllers
           amountController.clear();
@@ -277,6 +280,8 @@ class _HomePageState extends State<HomePage> {
           await context
               .read<ExpenseDatabase>()
               .updateExpense(existingId, updatedExpense);
+          // refresh the graph
+          refreshGraphData();
         }
       },
       child: const Text('Save'),
@@ -291,6 +296,8 @@ class _HomePageState extends State<HomePage> {
         Navigator.pop(context);
         // delete expense from db
         await context.read<ExpenseDatabase>().deleteExpense(id);
+        //refresh the graph
+        refreshGraphData();
       },
       child: const Text('Delete'),
     );
